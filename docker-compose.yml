@@ -1,0 +1,74 @@
+# Define application services
+services:
+  # PostgreSQL database service
+  opsdesk-postgres:
+    image: postgres:16-alpine
+    container_name: opsdesk-postgres
+    restart: unless-stopped
+
+    # Load database credentials from environment file
+    env_file:
+      - ./infra/postgres/.env
+
+    # Expose PostgreSQL port
+    ports:
+      - "5432:5432"
+
+    # Persist database data using the existing Docker volume
+    volumes:
+      - opsdesk_postgres_data:/var/lib/postgresql/data
+
+    # Check database readiness before starting the backend
+    healthcheck:
+      test:
+        ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI backend service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: opsdesk-backend
+    restart: unless-stopped
+
+    # Load backend environment variables from .env file
+    env_file:
+      - ./backend/.env
+
+    # Expose FastAPI port
+    ports:
+      - "8000:8000"
+
+    # Ensure the backend service starts after the database is healthy
+    depends_on:
+      opsdesk-postgres:
+        condition: service_healthy
+  # React frontend service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+      # Pass the backend API URL during the production build
+      args:
+        VITE_API_BASE_URL: http://localhost:8000/api/v1
+    container_name: opsdesk-frontend
+    restart: unless-stopped
+
+    # Expose React frontend port
+    ports:
+      - "5173:80"
+
+    # Start the frontend after the backend service starts
+    depends_on:
+      - backend
+
+# Define persistent storage
+volumes:
+  # Reuse the existing PostgreSQL data volume
+  opsdesk_postgres_data:
+    external: true
+    name: opsdesk_postgres_data
