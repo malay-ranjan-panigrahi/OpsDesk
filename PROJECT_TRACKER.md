@@ -395,3 +395,61 @@ Advanced real-time messaging, WebSockets, Redis-based notification delivery, mes
 ---
 
 **Maintenance rule:** Update this tracker whenever a significant feature, API, database migration, deployment component, or operational workflow is added or changed. Keep implementation status factual: use `Implemented`, `In Progress`, `Planned`, or `Not Started` as appropriate.
+
+## Docker Implementation and Validation
+
+**Status: Completed**
+
+### Docker Configuration
+- Created a Dockerfile for the FastAPI backend.
+- Created a multi-stage Dockerfile for the React frontend using Node.js and Nginx.
+- Added `.dockerignore` files for both frontend and backend.
+- Built backend and frontend Docker images successfully.
+- Created the `opsdesk-network` Docker network.
+- Connected the backend container to the existing PostgreSQL container.
+
+### Issues Identified and Resolved
+
+1. **Frontend API configuration**
+   - Configured the production frontend API URL using `VITE_API_BASE_URL`.
+   - Rebuilt the frontend image with the correct API endpoint.
+
+2. **PostgreSQL connectivity**
+   - Identified that the backend was trying to connect to PostgreSQL through `localhost`.
+   - Updated the backend database hostname to `opsdesk-postgres`.
+   - Recreated the backend container with the corrected environment configuration.
+
+3. **CORS validation**
+   - Verified the browser-origin preflight request.
+   - Confirmed that the backend allows requests from `http://localhost:5173`.
+
+4. **Database readiness**
+   - Verified that the backend successfully connects to PostgreSQL.
+   - Confirmed that the readiness endpoint reports the database as connected.
+
+### Application Validation
+
+Successfully tested the following:
+
+- Frontend application loads through the Nginx container.
+- Backend health and readiness endpoints return successful responses.
+- User authentication and login work.
+- Dashboard loads successfully.
+- Incident creation works.
+- Created incidents appear in the incident list.
+
+### Docker Resources
+
+| Resource | Name |
+|---|---|
+| Backend container | opsdesk-backend |
+| Frontend container | opsdesk-frontend |
+| PostgreSQL container | opsdesk-postgres |
+| Docker network | opsdesk-network |
+| PostgreSQL volume | opsdesk_postgres_data |
+
+### Next Steps
+
+- Implement Docker Compose for managing all application services.
+- Validate service dependencies and database persistence.
+- Continue with Jenkins CI implementation.
