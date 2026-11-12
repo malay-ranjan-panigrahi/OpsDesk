@@ -341,10 +341,7 @@ function App() {
   const extendedDashboard = dashboard as ExtendedDashboard | null;
 
   useEffect(() => {
-    if (!token) {
-      setAuditLogs([]);
-      return;
-    }
+    if (!token) return;
 
     let isActive = true;
 
@@ -372,11 +369,7 @@ function App() {
     };
   }, [token]);
   useEffect(() => {
-    if (!token) {
-      setNotifications([]);
-      setUnreadCount(0);
-      return;
-    }
+    if (!token) return;
 
     let isActive = true;
 
@@ -512,14 +505,7 @@ function App() {
   // NEW: System health monitoring.
 
   useEffect(() => {
-    if (!token) {
-      setSystemHealth({
-        api: "idle",
-        database: "idle",
-        incidents: "idle",
-      });
-      return;
-    }
+    if (!token) return;
 
     let active = true;
 
@@ -797,6 +783,10 @@ function App() {
   function handleLogout() {
     setUser(null);
     setToken(null);
+    setAuditLogs([]);
+    setNotifications([]);
+    setUnreadCount(0);
+    setSystemHealth({ api: "idle", database: "idle", incidents: "idle" });
     setDashboard(null);
     setIncidents([]);
     setSelectedIncident(null);
