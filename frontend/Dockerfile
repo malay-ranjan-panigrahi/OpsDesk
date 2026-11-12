@@ -1,28 +1,28 @@
-
 # Use Node.js to build the React application
 FROM node:22-alpine AS build
 
-# Set working directory
+# Set the frontend working directory
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Configure the backend API URL during the build
+ARG VITE_API_BASE_URL=http://localhost:8000/api/v1
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+
+# Install frontend dependencies
 COPY package*.json ./
 RUN npm ci
 
 # Copy frontend source code
 COPY . .
 
-# Build the production frontend
+# Create the production frontend build
 RUN npm run build
 
-# Use Nginx to serve the production build
-FROM nginx:alpine
+# Use the official unprivileged NGINX image
+FROM nginx/nginx-unprivileged:stable-alpine
 
-# Copy build output to Nginx web directory
+# Copy the frontend build into the NGINX web directory
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Expose frontend port
-EXPOSE 80
-
-# Start Nginx in foreground
-CMD ["nginx", "-g", "daemon off;"]
+# Expose the unprivileged NGINX port
+EXPOSE 8080

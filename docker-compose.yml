@@ -60,7 +60,7 @@ services:
 
     # Expose React frontend port
     ports:
-      - "5173:80"
+      - "5173:8080"
 
     # Start the frontend after the backend service starts
     depends_on:
