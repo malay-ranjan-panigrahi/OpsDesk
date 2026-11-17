@@ -8,17 +8,26 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-# Install backend dependencies
+# Apply available Debian security updates
+RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install backend application dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Remove pip and its bundled development components from the runtime image
+RUN python -m pip uninstall -y pip
 
 # Copy backend application source code
 COPY . .
 
-# Create a non-root application User
-RUN groupadd --system app && \
-    useradd --system --gid app --create-home app && \
-    chown -R app:app /app
+# Create a dedicated non-root application user
+RUN groupadd --system app \
+    && useradd --system --gid app --create-home app \
+    && chown -R app:app /app
 
 # Run the application without root privileges
 USER app
