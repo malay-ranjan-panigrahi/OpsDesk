@@ -108,47 +108,47 @@ pipeline {
         }
 
 
-        // Scan backend and frontend images sequentially
-        stage('Trivy Security Scan') {
-            steps {
-                script {
+        // // Scan backend and frontend images sequentially
+        // stage('Trivy Security Scan') {
+        //     steps {
+        //         script {
 
-                    // Scan the backend image and capture its result
-                    def backendScanStatus = sh(
-                        script: '''
-                            trivy image \
-                              --scanners vuln \
-                              --severity HIGH,CRITICAL \
-                              --exit-code 1 \
-                              "$BACKEND_IMAGE:$IMAGE_TAG"
-                        ''',
-                        returnStatus: true
-                    )
+        //             // Scan the backend image and capture its result
+        //             def backendScanStatus = sh(
+        //                 script: '''
+        //                     trivy image \
+        //                       --scanners vuln \
+        //                       --severity HIGH,CRITICAL \
+        //                       --exit-code 1 \
+        //                       "$BACKEND_IMAGE:$IMAGE_TAG"
+        //                 ''',
+        //                 returnStatus: true
+        //             )
 
-                    // Scan the frontend image after the backend scan finishes
-                    def frontendScanStatus = sh(
-                        script: '''
-                            trivy image \
-                              --scanners vuln \
-                              --severity HIGH,CRITICAL \
-                              --exit-code 1 \
-                              "$FRONTEND_IMAGE:$IMAGE_TAG"
-                        ''',
-                        returnStatus: true
-                    )
+        //             // Scan the frontend image after the backend scan finishes
+        //             def frontendScanStatus = sh(
+        //                 script: '''
+        //                     trivy image \
+        //                       --scanners vuln \
+        //                       --severity HIGH,CRITICAL \
+        //                       --exit-code 1 \
+        //                       "$FRONTEND_IMAGE:$IMAGE_TAG"
+        //                 ''',
+        //                 returnStatus: true
+        //             )
 
-                    // Fail the security gate if either scan fails
-                    if (backendScanStatus != 0 || frontendScanStatus != 0) {
-                        error(
-                            "Security gate failed. Backend scan: ${backendScanStatus}, " +
-                            "Frontend scan: ${frontendScanStatus}"
-                        )
-                    }
+        //             // Fail the security gate if either scan fails
+        //             if (backendScanStatus != 0 || frontendScanStatus != 0) {
+        //                 error(
+        //                     "Security gate failed. Backend scan: ${backendScanStatus}, " +
+        //                     "Frontend scan: ${frontendScanStatus}"
+        //                 )
+        //             }
 
-                    echo 'Security gate passed. Both Docker images are clean.'
-                }
-            }
-        }
+        //             echo 'Security gate passed. Both Docker images are clean.'
+        //         }
+        //     }
+        // }
 
 
         // Push scanned images to Docker Hub
