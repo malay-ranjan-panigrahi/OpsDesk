@@ -31,7 +31,7 @@ pipeline {
         BACKEND_IMAGE = 'malaynew07/opsdesk-backend'
         FRONTEND_IMAGE = 'malaynew07/opsdesk-frontend'
         IMAGE_TAG = "${BUILD_NUMBER}"
-        VITE_API_BASE_URL = 'http://localhost:8000/api/v1'
+        VITE_API_BASE_URL = '/api/v1'
     }
 
     stages {
