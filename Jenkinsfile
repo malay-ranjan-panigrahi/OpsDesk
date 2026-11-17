@@ -86,6 +86,7 @@ pipeline {
                     steps {
                         sh '''
                             docker build --pull \
+                              --build-arg APT_CACHE_BUST="$BUILD_NUMBER" \
                               -t "$BACKEND_IMAGE:$IMAGE_TAG" \
                               ./backend
                         '''

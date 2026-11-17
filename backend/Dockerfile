@@ -8,8 +8,12 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
+# Refresh Debian packages when the Jenkins build number changes
+ARG APT_CACHE_BUST=1
+
 # Apply available Debian security updates
-RUN apt-get update \
+RUN echo "Refreshing Debian packages: ${APT_CACHE_BUST}" \
+    && apt-get update \
     && apt-get upgrade -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
